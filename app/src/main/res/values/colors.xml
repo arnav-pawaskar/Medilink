@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- MediLink Modern Color Scheme -->
+    <!-- Primary Colors - Medical Blue -->
+    <color name="primary">#0066FF</color>
+    <color name="primary_dark">#0052CC</color>
+    <color name="primary_light">#4D94FF</color>
+    <color name="primary_ultra_light">#E6F0FF</color>
+
+    <!-- Secondary Colors - Mint Green -->
+    <color name="secondary">#00D9A5</color>
+    <color name="secondary_dark">#00B386</color>
+    <color name="secondary_light">#66E8C8</color>
+
+    <!-- Accent Colors -->
+    <color name="accent_purple">#8B5CF6</color>
+    <color name="accent_orange">#FF9500</color>
+
+    <!-- Background Colors -->
+    <color name="background">#F8F9FA</color>
+    <color name="background_white">#FFFFFF</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_variant">#F5F7FA</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#1A1D1F</color>
+    <color name="text_secondary">#6F767E</color>
+    <color name="text_tertiary">#9A9FA5</color>
+    <color name="text_disabled">#C5C9CC</color>
+
+    <!-- Semantic Colors -->
+    <color name="success">#10B981</color>
+    <color name="success_light">#D1FAE5</color>
+    <color name="warning">#F59E0B</color>
+    <color name="warning_light">#FEF3C7</color>
+    <color name="error">#EF4444</color>
+    <color name="error_light">#FEE2E2</color>
+    <color name="info">#3B82F6</color>
+    <color name="info_light">#DBEAFE</color>
+
+    <!-- Border & Divider Colors -->
+    <color name="border">#E4E7EB</color>
+    <color name="divider">#F0F2F5</color>
+
+    <!-- Shadow Colors -->
+    <color name="shadow_light">#1A000000</color>
+    <color name="shadow_medium">#33000000</color>
+
+    <!-- Legacy Support (for backward compatibility) -->
+    <color name="primary_blue">#0066FF</color>
+    <color name="primary_blue_light">#4D94FF</color>
+    <color name="background_light">#F8F9FA</color>
+    <color name="background_gray">#F5F7FA</color>
+    <color name="border_gray">#E4E7EB</color>
+    <color name="text_dark">#1A1D1F</color>
+    <color name="success_green">#10B981</color>
+    <color name="error_red">#EF4444</color>
+</resources>
