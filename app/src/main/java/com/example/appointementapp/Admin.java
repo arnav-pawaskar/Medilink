@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -287,15 +288,6 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
         if (valueEventListener != null) {
             mDatabase.child("Appointments").removeEventListener(valueEventListener);
         }
-    }
-
-    /**
-     * Handle back button press
-     */
-    @Override
-    public void onBackPressed() {
-        // Optionally prevent back navigation for admin
-        super.onBackPressed();
     }
 }
 

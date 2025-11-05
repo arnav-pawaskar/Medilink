@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,7 +29,7 @@ public class Login extends AppCompatActivity {
     private FirebaseAuth mAuth;
 
     // Admin email constant
-    private static final String ADMIN_EMAIL = "admin@vitaltech.com";
+    private static final String ADMIN_EMAIL = "admin@gmail.com";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,7 +116,6 @@ public class Login extends AppCompatActivity {
 
                     if (task.isSuccessful()) {
                         // Login successful
-                        FirebaseUser user = mAuth.getCurrentUser();
                         Toast.makeText(Login.this, "Login successful!", Toast.LENGTH_SHORT).show();
 
                         // Check if user is admin
@@ -138,14 +136,14 @@ public class Login extends AppCompatActivity {
                         Exception exception = task.getException();
                         String errorMessage = exception != null ? exception.getMessage() : "Unknown error";
 
-
-                        if (errorMessage.contains("user not found")) {
+                        // Check for specific error types
+                        if (errorMessage != null && errorMessage.contains("user not found")) {
                             Toast.makeText(Login.this, "User not found. Please register first.", Toast.LENGTH_LONG).show();
-                        } else if (errorMessage.contains("password is invalid")) {
+                        } else if (errorMessage != null && errorMessage.contains("password is invalid")) {
                             Toast.makeText(Login.this, "Invalid password. Please try again.", Toast.LENGTH_LONG).show();
-                        } else if (errorMessage.contains("network")) {
+                        } else if (errorMessage != null && errorMessage.contains("network")) {
                             Toast.makeText(Login.this, "Network error. Please check your internet connection.", Toast.LENGTH_LONG).show();
-                        } else if (errorMessage.contains("internal")) {
+                        } else if (errorMessage != null && errorMessage.contains("internal")) {
                             Toast.makeText(Login.this, "Firebase internal error. Check database rules in Firebase Console.", Toast.LENGTH_LONG).show();
                         } else {
                             Toast.makeText(Login.this, "Error: " + errorMessage, Toast.LENGTH_LONG).show();
