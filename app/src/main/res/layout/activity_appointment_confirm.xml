@@ -240,12 +240,12 @@
                     android:id="@+id/btnChatbot"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:text="💬 Talk to AI Medical Assistant"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/white"
+                    android:layout_marginBottom="12dp"
                     android:background="@drawable/button_secondary"
-                    android:layout_marginBottom="12dp" />
+                    android:text="Talk to AI Medical Assistant"
+                    android:textColor="@color/white"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
 
                 <Button
                     android:id="@+id/btnLogout"

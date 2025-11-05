@@ -1,6 +1,10 @@
 package com.example.appointementapp;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -8,10 +12,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,26 +31,24 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
-/**
- * Admin Dashboard Activity
- * Allows admins to view, search, confirm, and cancel appointments
- * Real-time updates from Firebase Realtime Database
- */
+// Admin Dashboard Activity
+
 public class Admin extends AppCompatActivity implements AppointmentAdapter.OnAppointmentActionListener {
 
-    // UI Components
+
     private RecyclerView rvAppointments;
     private EditText etSearchPatient;
     private Button btnLogout, btnRefresh;
     private ProgressBar progressBar;
 
-    // Firebase components
+
     private DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
 
-    // Adapter and data
+
     private AppointmentAdapter adapter;
     private List<Appointment> appointmentList;
     private List<Appointment> filteredList;
@@ -53,29 +59,27 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
 
-        // Initialize Firebase
+
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
 
-        // Initialize UI components
+
         initializeViews();
 
-        // Setup RecyclerView
+
         setupRecyclerView();
 
-        // Setup search functionality
+
         setupSearchFunctionality();
 
-        // Setup click listeners
+
         setupClickListeners();
 
-        // Load appointments from Firebase
+
         loadAppointments();
     }
 
-    /**
-     * Initialize all UI components
-     */
+
     private void initializeViews() {
         rvAppointments = findViewById(R.id.rvAppointments);
         etSearchPatient = findViewById(R.id.etSearchPatient);
@@ -84,9 +88,7 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
         progressBar = findViewById(R.id.progressBar);
     }
 
-    /**
-     * Setup RecyclerView with LinearLayoutManager and adapter
-     */
+
     private void setupRecyclerView() {
         appointmentList = new ArrayList<>();
         filteredList = new ArrayList<>();
@@ -94,11 +96,67 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
         adapter = new AppointmentAdapter(this, filteredList, this);
         rvAppointments.setLayoutManager(new LinearLayoutManager(this));
         rvAppointments.setAdapter(adapter);
+
+
+        setupSwipeToDelete();
     }
 
-    /**
-     * Setup search functionality with debouncing
-     */
+
+    private void setupSwipeToDelete() {
+        ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder,
+                                @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                Appointment appointment = adapter.getItem(position);
+
+                if (appointment != null && "cancelled".equalsIgnoreCase(appointment.getStatus())) {
+
+                    showDeleteConfirmationDialog(appointment, position);
+                } else {
+
+                    adapter.notifyItemChanged(position);
+                    Toast.makeText(Admin.this, "Only cancelled appointments can be deleted", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public int getSwipeDirs(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+                int position = viewHolder.getAdapterPosition();
+                Appointment appointment = adapter.getItem(position);
+
+
+                if (appointment != null && "cancelled".equalsIgnoreCase(appointment.getStatus())) {
+                    return super.getSwipeDirs(recyclerView, viewHolder);
+                }
+                return 0;
+            }
+
+            @Override
+            public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView,
+                                  @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY,
+                                  int actionState, boolean isCurrentlyActive) {
+
+                int position = viewHolder.getAdapterPosition();
+                Appointment appointment = adapter.getItem(position);
+
+                if (appointment != null && "cancelled".equalsIgnoreCase(appointment.getStatus())) {
+                    super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                }
+            }
+        };
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
+        itemTouchHelper.attachToRecyclerView(rvAppointments);
+    }
+
+    // Setup search functionality
+
     private void setupSearchFunctionality() {
         etSearchPatient.addTextChangedListener(new TextWatcher() {
             @Override
@@ -116,9 +174,7 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
         });
     }
 
-    /**
-     * Filter appointments based on patient name search
-     */
+
     private void filterAppointments(String searchQuery) {
         filteredList.clear();
 
@@ -138,22 +194,18 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
         adapter.notifyDataSetChanged();
     }
 
-    /**
-     * Setup click listeners for buttons
-     */
+
     private void setupClickListeners() {
         btnLogout.setOnClickListener(v -> logout());
         btnRefresh.setOnClickListener(v -> loadAppointments());
     }
 
-    /**
-     * Load all appointments from Firebase Realtime Database
-     * Implements real-time updates using ValueEventListener
-     */
+    //Load all appointments from Firebase Realtime Database
+
     private void loadAppointments() {
         progressBar.setVisibility(View.VISIBLE);
 
-        // Remove previous listener if exists
+
         if (valueEventListener != null) {
             mDatabase.child("Appointments").removeEventListener(valueEventListener);
         }
@@ -172,7 +224,7 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
                         }
                     }
 
-                    // Initially show all appointments
+
                     filteredList.addAll(appointmentList);
                     adapter.notifyDataSetChanged();
 
@@ -194,14 +246,12 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
             }
         };
 
-        // Attach listener for real-time updates
+
         mDatabase.child("Appointments").addValueEventListener(valueEventListener);
     }
 
-    /**
-     * Handle confirm appointment action
-     * Updates appointment status to "confirmed" in Firebase
-     */
+    // Handle confirm appointment action
+
     @Override
     public void onConfirmClick(Appointment appointment) {
         if (appointment.getAppointmentId() != null) {
@@ -222,10 +272,8 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
         }
     }
 
-    /**
-     * Handle cancel appointment action
-     * Updates appointment status to "cancelled" in Firebase
-     */
+    // Handle cancel appointment action
+
     @Override
     public void onCancelClick(Appointment appointment) {
         if (appointment.getAppointmentId() != null) {
@@ -246,19 +294,77 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
         }
     }
 
-    /**
-     * Handle appointment item click
-     * Can be used for viewing detailed appointment information
-     */
+
     @Override
     public void onItemClick(Appointment appointment) {
         // Optional: Navigate to detailed view
         Toast.makeText(this, "Appointment: " + appointment.getUserName(), Toast.LENGTH_SHORT).show();
     }
 
-    /**
-     * Handle logout functionality
-     */
+
+    @Override
+    public void onDeleteClick(Appointment appointment, int position) {
+        showDeleteConfirmationDialog(appointment, position);
+    }
+
+    // Handle reschedule appointment action
+    @Override
+    public void onRescheduleClick(Appointment appointment) {
+        showRescheduleDialog(appointment);
+    }
+
+
+    private void showDeleteConfirmationDialog(Appointment appointment, int position) {
+        new AlertDialog.Builder(this)
+                .setTitle("Delete Appointment")
+                .setMessage("Are you sure you want to permanently delete this cancelled appointment for " +
+                        appointment.getUserName() + "?")
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    deleteAppointment(appointment, position);
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    // Restore the item if user cancels
+                    adapter.notifyItemChanged(position);
+                    dialog.dismiss();
+                })
+                .setCancelable(false)
+                .show();
+    }
+
+
+    private void deleteAppointment(Appointment appointment, int position) {
+        if (appointment.getAppointmentId() == null) {
+            Toast.makeText(this, "Error: Invalid appointment ID", Toast.LENGTH_SHORT).show();
+            adapter.notifyItemChanged(position);
+            return;
+        }
+
+        progressBar.setVisibility(View.VISIBLE);
+
+        mDatabase.child("Appointments").child(appointment.getAppointmentId())
+                .removeValue()
+                .addOnSuccessListener(aVoid -> {
+                    progressBar.setVisibility(View.GONE);
+
+
+                    appointmentList.remove(appointment);
+                    filteredList.remove(appointment);
+
+
+                    adapter.notifyItemRemoved(position);
+                    adapter.notifyItemRangeChanged(position, filteredList.size());
+
+                    Toast.makeText(Admin.this, "Appointment deleted successfully", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    progressBar.setVisibility(View.GONE);
+                    adapter.notifyItemChanged(position);
+                    Toast.makeText(Admin.this, "Error deleting appointment: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                });
+    }
+
+
     private void logout() {
         mAuth.signOut();
         Intent intent = new Intent(Admin.this, Login.class);
@@ -267,9 +373,107 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
         finish();
     }
 
-    /**
-     * Check if user is still logged in and is admin
-     */
+    // Show reschedule dialog with date and time pickers
+    private void showRescheduleDialog(Appointment appointment) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_reschedule_appointment, null);
+        builder.setView(dialogView);
+
+        AlertDialog dialog = builder.create();
+
+        // Initialize dialog views
+        TextView tvPatientInfo = dialogView.findViewById(R.id.tvPatientInfo);
+        TextView tvCurrentDateTime = dialogView.findViewById(R.id.tvCurrentDateTime);
+        Button btnSelectNewDate = dialogView.findViewById(R.id.btnSelectNewDate);
+        Button btnSelectNewTime = dialogView.findViewById(R.id.btnSelectNewTime);
+        Button btnCancelReschedule = dialogView.findViewById(R.id.btnCancelReschedule);
+        Button btnConfirmReschedule = dialogView.findViewById(R.id.btnConfirmReschedule);
+
+        // Set current appointment info
+        tvPatientInfo.setText("Patient: " + appointment.getUserName());
+        tvCurrentDateTime.setText("Current: " + appointment.getDate() + " | " + appointment.getTime());
+
+        // Variables to store new date and time
+        final String[] newDate = {""};
+        final String[] newTime = {""};
+
+        // Calendar instance for date/time pickers
+        Calendar calendar = Calendar.getInstance();
+
+        // Date picker
+        btnSelectNewDate.setOnClickListener(v -> {
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH);
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+            DatePickerDialog datePickerDialog = new DatePickerDialog(
+                    Admin.this,
+                    (view, selectedYear, selectedMonth, selectedDay) -> {
+                        newDate[0] = String.format("%02d/%02d/%04d", selectedDay, selectedMonth + 1, selectedYear);
+                        btnSelectNewDate.setText(newDate[0]);
+                        btnSelectNewDate.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.success)));
+                    },
+                    year, month, day
+            );
+
+            // Set minimum date to today
+            datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+            datePickerDialog.show();
+        });
+
+        // Time picker
+        btnSelectNewTime.setOnClickListener(v -> {
+            int hour = calendar.get(Calendar.HOUR_OF_DAY);
+            int minute = calendar.get(Calendar.MINUTE);
+
+            TimePickerDialog timePickerDialog = new TimePickerDialog(
+                    Admin.this,
+                    (view, selectedHour, selectedMinute) -> {
+                        String amPm = selectedHour >= 12 ? "PM" : "AM";
+                        int hour12 = selectedHour % 12;
+                        if (hour12 == 0) hour12 = 12;
+                        newTime[0] = String.format("%02d:%02d %s", hour12, selectedMinute, amPm);
+                        btnSelectNewTime.setText(newTime[0]);
+                        btnSelectNewTime.setBackgroundTintList(android.content.res.ColorStateList.valueOf(getColor(R.color.success)));
+                    },
+                    hour, minute, false
+            );
+            timePickerDialog.show();
+        });
+
+        // Cancel button
+        btnCancelReschedule.setOnClickListener(v -> dialog.dismiss());
+
+        // Confirm reschedule button
+        btnConfirmReschedule.setOnClickListener(v -> {
+            if (newDate[0].isEmpty() || newTime[0].isEmpty()) {
+                Toast.makeText(Admin.this, "Please select both date and time", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Update appointment with new date and time
+            progressBar.setVisibility(View.VISIBLE);
+            appointment.setDate(newDate[0]);
+            appointment.setTime(newTime[0]);
+
+            mDatabase.child("Appointments").child(appointment.getAppointmentId())
+                    .setValue(appointment)
+                    .addOnSuccessListener(aVoid -> {
+                        progressBar.setVisibility(View.GONE);
+                        Toast.makeText(Admin.this, "Appointment rescheduled successfully!", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    })
+                    .addOnFailureListener(e -> {
+                        progressBar.setVisibility(View.GONE);
+                        Toast.makeText(Admin.this, "Error rescheduling appointment: " + e.getMessage(),
+                                Toast.LENGTH_SHORT).show();
+                    });
+        });
+
+        dialog.show();
+    }
+
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -279,9 +483,7 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
         }
     }
 
-    /**
-     * Remove event listener when activity is destroyed to prevent memory leaks
-     */
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -290,4 +492,3 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
         }
     }
 }
-

@@ -4,10 +4,10 @@
     <color name="white">#FFFFFFFF</color>
 
     <!-- MediLink Modern Color Scheme -->
-    <!-- Primary Colors - Medical Blue -->
-    <color name="primary">#0066FF</color>
-    <color name="primary_dark">#0052CC</color>
-    <color name="primary_light">#4D94FF</color>
+    <!-- Primary Colors - Medical Blue (Darker and more vibrant for actual devices) -->
+    <color name="primary">#0052CC</color>
+    <color name="primary_dark">#003D99</color>
+    <color name="primary_light">#3385FF</color>
     <color name="primary_ultra_light">#E6F0FF</color>
 
     <!-- Secondary Colors - Mint Green -->
@@ -16,7 +16,7 @@
     <color name="secondary_light">#66E8C8</color>
 
     <!-- Accent Colors -->
-    <color name="accent_purple">#8B5CF6</color>
+    <color name="accent_purple">#6B21A8</color>
     <color name="accent_orange">#FF9500</color>
 
     <!-- Background Colors -->
@@ -49,9 +49,15 @@
     <color name="shadow_light">#1A000000</color>
     <color name="shadow_medium">#33000000</color>
 
+    <!-- Chatbot Colors -->
+    <color name="chat_user_bubble">#1E3A8A</color>
+    <color name="chat_bot_bubble">#ECF0F1</color>
+    <color name="chat_user_text">#FFFFFF</color>
+    <color name="chat_bot_text">#2C3E50</color>
+
     <!-- Legacy Support (for backward compatibility) -->
-    <color name="primary_blue">#0066FF</color>
-    <color name="primary_blue_light">#4D94FF</color>
+    <color name="primary_blue">#0052CC</color>
+    <color name="primary_blue_light">#3385FF</color>
     <color name="background_light">#F8F9FA</color>
     <color name="background_gray">#F5F7FA</color>
     <color name="border_gray">#E4E7EB</color>

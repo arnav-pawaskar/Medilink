@@ -1,10 +1,7 @@
 package com.example.appointementapp;
 
-/**
- * Appointment Model Class
- * Represents an appointment with all patient and appointment details
- * Used for data serialization/deserialization with Firebase Realtime Database
- */
+// Appointment Model Class
+
 public class Appointment {
     private String appointmentId;
     private String userName;
@@ -17,17 +14,12 @@ public class Appointment {
     private String date;
     private String time;
     private String userId;
-    private String status; // pending, confirmed, cancelled
+    private String status;
 
-    /**
-     * Default constructor (required by Firebase)
-     */
+
     public Appointment() {
     }
 
-    /**
-     * Constructor with all parameters
-     */
     public Appointment(String appointmentId, String userName, String userEmail,
                        String phoneNumber, String bloodGroup, String pastProblems,
                        String familyMedicalHistory, String problemDescription,
@@ -144,9 +136,7 @@ public class Appointment {
         this.status = status;
     }
 
-    /**
-     * Override toString for debugging
-     */
+
     @Override
     public String toString() {
         return "Appointment{" +

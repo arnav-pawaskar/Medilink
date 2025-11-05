@@ -30,25 +30,22 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-/**
- * Chatbot Activity - AI-powered medical assistant
- * Integrates with Google Gemini API for medical consultations
- * Provides conversational interface with message history
- */
+// Chatbot Activity - AI-powered medical assistant
+
 public class Chatbot extends AppCompatActivity {
 
     // UI Components
     private ScrollView svMessages;
     private LinearLayout llMessages;
     private EditText etMessage;
-    private Button btnSend, btnBack, btnLogout;
+    private Button btnSend, btnBack;
     private ProgressBar progressBar;
     private TextView tvChatTitle;
 
-    // API Key
+
     private String geminiApiKey;
 
-    // Patient information
+
     private String appointmentId;
     private String patientName;
     private String patientEmail;
@@ -57,16 +54,14 @@ public class Chatbot extends AppCompatActivity {
     private String familyHistory;
     private String problemDescription;
 
-    // API configuration
+
     private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent";
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
-    // Conversation history
+
     private List<Message> conversationHistory;
 
-    /**
-     * Message class for storing chat messages
-     */
+
     private static class Message {
         String text;
         boolean isFromUser;
@@ -83,42 +78,37 @@ public class Chatbot extends AppCompatActivity {
         setContentView(R.layout.activity_chatbot);
 
 
-        // Initialize UI components
+
         initializeViews();
 
-        // Get patient data from intent
+
         getPatientDataFromIntent();
 
-        // Initialize conversation history
+
         conversationHistory = new ArrayList<>();
 
-        // Setup click listeners
+
         setupClickListeners();
 
-        // Load Gemini API key
+
         loadGeminiApiKey();
 
-        // Display welcome message
+
         displayWelcomeMessage();
     }
 
-    /**
-     * Initialize all UI components
-     */
+
     private void initializeViews() {
         svMessages = findViewById(R.id.svMessages);
         llMessages = findViewById(R.id.llMessages);
         etMessage = findViewById(R.id.etMessage);
         btnSend = findViewById(R.id.btnSend);
         btnBack = findViewById(R.id.btnBack);
-        btnLogout = findViewById(R.id.btnLogout);
         progressBar = findViewById(R.id.progressBar);
         tvChatTitle = findViewById(R.id.tvChatTitle);
     }
 
-    /**
-     * Get patient information from intent extras
-     */
+
     private void getPatientDataFromIntent() {
         Intent intent = getIntent();
         appointmentId = intent.getStringExtra("appointmentId");
@@ -129,24 +119,22 @@ public class Chatbot extends AppCompatActivity {
         familyHistory = intent.getStringExtra("familyHistory");
         problemDescription = intent.getStringExtra("problemDescription");
 
-        // Set title with patient name
-        if (patientName != null) {
+
+        if (patientName != null && !patientName.isEmpty()) {
             tvChatTitle.setText("Chat with AI - " + patientName);
+        } else {
+            tvChatTitle.setText("Chat with AI");
         }
     }
 
-    /**
-     * Setup click listeners for buttons
-     */
+
     private void setupClickListeners() {
         btnSend.setOnClickListener(v -> sendMessage());
         btnBack.setOnClickListener(v -> finish());
-        btnLogout.setOnClickListener(v -> logout());
     }
 
-    /**
-     * Load Gemini API key from strings.xml
-     */
+    //Load Gemini API key from strings.xml
+
     private void loadGeminiApiKey() {
         // Get API key from strings.xml
         geminiApiKey = getString(R.string.gemini_api_key);
@@ -161,9 +149,7 @@ public class Chatbot extends AppCompatActivity {
     }
 
 
-    /**
-     * Display welcome message and patient context
-     */
+
     private void displayWelcomeMessage() {
         String welcomeText = "Hello! I'm MediLink's AI Healthcare Assistant.\n\n" +
                 "I've reviewed your information:\n" +
@@ -175,9 +161,8 @@ public class Chatbot extends AppCompatActivity {
         addMessageToUI(welcomeText, false);
     }
 
-    /**
-     * Send user message and get AI response
-     */
+    // Send user message and get AI response
+
     private void sendMessage() {
         String userMessage = etMessage.getText().toString().trim();
 
@@ -191,17 +176,16 @@ public class Chatbot extends AppCompatActivity {
             return;
         }
 
-        // Add user message to UI (but NOT to history yet - we'll add after API call)
         addMessageToUI(userMessage, true);
 
-        // Clear input field
+
         etMessage.setText("");
 
-        // Show progress bar
+
         progressBar.setVisibility(View.VISIBLE);
         btnSend.setEnabled(false);
 
-        // Get AI response in background thread
+
         new Thread(() -> {
             try {
                 String botResponse = callGeminiAPI(userMessage);
@@ -228,9 +212,8 @@ public class Chatbot extends AppCompatActivity {
         }).start();
     }
 
-    /**
-     * Call Google Gemini API with medical context
-     */
+    // Call Google Gemini API with medical context
+
     private String callGeminiAPI(String userMessage) throws IOException, JSONException {
         OkHttpClient client = new OkHttpClient();
 
@@ -247,17 +230,17 @@ public class Chatbot extends AppCompatActivity {
                 "Recommended Specialist, and Next Steps. " +
                 "Only answer medical questions. For off-topic queries, politely redirect to medical topics.";
 
-        // Build request body
+
         JSONObject requestBody = new JSONObject();
         JSONArray contentsArray = new JSONArray();
 
-        // If this is the first message, prepend system context to user message
+
         String messageToSend = userMessage;
         if (conversationHistory.isEmpty()) {
             messageToSend = systemPrompt + "\n\nUser question: " + userMessage;
         }
 
-        // Add conversation history (previous user and model messages only)
+
         for (Message msg : conversationHistory) {
             JSONObject msgObj = new JSONObject();
             msgObj.put("role", msg.isFromUser ? "user" : "model");
@@ -269,7 +252,7 @@ public class Chatbot extends AppCompatActivity {
             contentsArray.put(msgObj);
         }
 
-        // Add current user message
+
         JSONObject userMsg = new JSONObject();
         userMsg.put("role", "user");
         JSONArray userParts = new JSONArray();
@@ -281,7 +264,7 @@ public class Chatbot extends AppCompatActivity {
 
         requestBody.put("contents", contentsArray);
 
-        // Add generation configuration
+
         JSONObject generationConfig = new JSONObject();
         generationConfig.put("temperature", 0.7);
         generationConfig.put("topP", 0.95);
@@ -290,7 +273,6 @@ public class Chatbot extends AppCompatActivity {
         requestBody.put("generationConfig", generationConfig);
 
 
-        // Create request with proper headers
         String url = GEMINI_API_URL + "?key=" + geminiApiKey;
         Request request = new Request.Builder()
                 .url(url)
@@ -298,7 +280,7 @@ public class Chatbot extends AppCompatActivity {
                 .post(RequestBody.create(requestBody.toString(), JSON))
                 .build();
 
-        // Execute request
+
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
                 String errorBody = "";
@@ -312,7 +294,7 @@ public class Chatbot extends AppCompatActivity {
 
             JSONObject jsonResponse = new JSONObject(responseBody);
 
-            // Extract text from response
+
             if (jsonResponse.has("candidates")) {
                 JSONArray candidates = jsonResponse.getJSONArray("candidates");
                 if (candidates.length() > 0) {
@@ -336,9 +318,8 @@ public class Chatbot extends AppCompatActivity {
         }
     }
 
-    /**
-     * Add message to UI with proper chat bubble styling
-     */
+
+
     private void addMessageToUI(String message, boolean isFromUser) {
         LinearLayout messageContainer = new LinearLayout(this);
         messageContainer.setOrientation(LinearLayout.HORIZONTAL);
@@ -347,45 +328,42 @@ public class Chatbot extends AppCompatActivity {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        containerParams.setMargins(0, 6, 0, 6);
+        containerParams.setMargins(0, 8, 0, 8);
         messageContainer.setLayoutParams(containerParams);
         messageContainer.setGravity(isFromUser ? Gravity.END : Gravity.START);
-        messageContainer.setPadding(8, 4, 8, 4);
+        messageContainer.setPadding(isFromUser ? 48 : 8, 0, isFromUser ? 8 : 48, 0);
 
-        // Create the message bubble
+
         androidx.cardview.widget.CardView cardView = new androidx.cardview.widget.CardView(this);
-        cardView.setRadius(12);
-        cardView.setCardElevation(2);
+        cardView.setRadius(20);
+        cardView.setCardElevation(1);
 
-        // Calculate max width (75% of screen width)
-        int maxWidth = (int) (getResources().getDisplayMetrics().widthPixels * 0.75);
+        int maxWidth = (int) (getResources().getDisplayMetrics().widthPixels * 0.80);
 
         LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        cardParams.weight = 0;
         cardView.setLayoutParams(cardParams);
 
-        // Set background color based on sender
         if (isFromUser) {
-            cardView.setCardBackgroundColor(0xFF1E3A8A); // Dark blue for user
+            cardView.setCardBackgroundColor(getResources().getColor(R.color.chat_user_bubble, null));
         } else {
-            cardView.setCardBackgroundColor(0xFFE8F0FE); // Light blue for bot
+            cardView.setCardBackgroundColor(getResources().getColor(R.color.chat_bot_bubble, null));
         }
 
-        // Create text view for message
         TextView messageView = new TextView(this);
         messageView.setText(message);
-        messageView.setTextSize(14);
-        messageView.setLineSpacing(1.2f, 1.0f);
-        messageView.setPadding(12, 8, 12, 8);
+        messageView.setTextSize(15);
+        messageView.setLineSpacing(4f, 1.0f);
+        messageView.setPadding(20, 14, 20, 14);
         messageView.setMaxWidth(maxWidth);
 
+
         if (isFromUser) {
-            messageView.setTextColor(0xFFFFFFFF); // White text for user
+            messageView.setTextColor(getResources().getColor(R.color.chat_user_text, null));
         } else {
-            messageView.setTextColor(0xFF1F2937); // Dark gray text for bot
+            messageView.setTextColor(getResources().getColor(R.color.chat_bot_text, null));
         }
 
         cardView.addView(messageView);
@@ -393,7 +371,6 @@ public class Chatbot extends AppCompatActivity {
 
         llMessages.addView(messageContainer);
 
-        // Auto-scroll to bottom
         svMessages.post(() -> svMessages.fullScroll(View.FOCUS_DOWN));
     }
 
@@ -407,9 +384,7 @@ public class Chatbot extends AppCompatActivity {
         finish();
     }
 
-    /**
-     * Handle logout
-     */
+
     private void logout() {
         Intent intent = new Intent(Chatbot.this, Login.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -417,13 +392,10 @@ public class Chatbot extends AppCompatActivity {
         finish();
     }
 
-    /**
-     * Handle back button press
-     */
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         goBackToConfirmation();
     }
 }
-

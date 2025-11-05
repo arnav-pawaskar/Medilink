@@ -13,28 +13,24 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-/**
- * AppointmentAdapter - Custom RecyclerView adapter for displaying appointments
- * Binds appointment data to CardView items with confirm/cancel action buttons
- */
+// AppointmentAdapter - Custom RecyclerView adapter for displaying appointments
+
 public class AppointmentAdapter extends RecyclerView.Adapter<AppointmentAdapter.AppointmentViewHolder> {
 
     private List<Appointment> appointmentList;
     private Context context;
     private OnAppointmentActionListener actionListener;
 
-    /**
-     * Interface for appointment action callbacks
-     */
+
     public interface OnAppointmentActionListener {
         void onConfirmClick(Appointment appointment);
         void onCancelClick(Appointment appointment);
         void onItemClick(Appointment appointment);
+        void onDeleteClick(Appointment appointment, int position);
+        void onRescheduleClick(Appointment appointment);
     }
 
-    /**
-     * Constructor
-     */
+
     public AppointmentAdapter(Context context, List<Appointment> appointmentList,
                             OnAppointmentActionListener actionListener) {
         this.context = context;
@@ -42,9 +38,7 @@ public class AppointmentAdapter extends RecyclerView.Adapter<AppointmentAdapter.
         this.actionListener = actionListener;
     }
 
-    /**
-     * Create ViewHolder when RecyclerView needs a new item view
-     */
+
     @NonNull
     @Override
     public AppointmentViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -52,26 +46,24 @@ public class AppointmentAdapter extends RecyclerView.Adapter<AppointmentAdapter.
         return new AppointmentViewHolder(view);
     }
 
-    /**
-     * Bind data to ViewHolder at specified position
-     */
+
     @Override
     public void onBindViewHolder(@NonNull AppointmentViewHolder holder, int position) {
         Appointment appointment = appointmentList.get(position);
 
-        // Set patient name (remove "Patient:" prefix for cleaner look)
+
         holder.tvPatientName.setText(appointment.getUserName());
 
-        // Set email (remove "Email:" prefix, icon shows this)
+
         holder.tvEmail.setText(appointment.getUserEmail());
 
-        // Set phone (remove "Phone:" prefix, icon shows this)
+
         holder.tvPhone.setText(appointment.getPhoneNumber());
 
-        // Set appointment date and time
+
         holder.tvDateTime.setText(appointment.getDate() + " | " + appointment.getTime());
 
-        // Set status with color coding
+
         String status = appointment.getStatus() != null ? appointment.getStatus() : "pending";
         holder.tvStatus.setText("● " + status.substring(0, 1).toUpperCase() + status.substring(1));
 
@@ -83,7 +75,7 @@ public class AppointmentAdapter extends RecyclerView.Adapter<AppointmentAdapter.
             holder.tvStatus.setTextColor(ContextCompat.getColor(context, R.color.warning));
         }
 
-        // Disable buttons if appointment is already confirmed or cancelled
+
         if ("confirmed".equalsIgnoreCase(status) || "cancelled".equalsIgnoreCase(status)) {
             holder.btnConfirm.setEnabled(false);
             holder.btnCancel.setEnabled(false);
@@ -96,7 +88,16 @@ public class AppointmentAdapter extends RecyclerView.Adapter<AppointmentAdapter.
             holder.btnCancel.setAlpha(1.0f);
         }
 
-        // Set button click listeners
+        // Show reschedule button only for confirmed appointments
+        if ("confirmed".equalsIgnoreCase(status)) {
+            holder.btnReschedule.setVisibility(View.VISIBLE);
+            holder.btnReschedule.setEnabled(true);
+            holder.btnReschedule.setAlpha(1.0f);
+        } else {
+            holder.btnReschedule.setVisibility(View.GONE);
+        }
+
+
         holder.btnConfirm.setOnClickListener(v -> {
             if (actionListener != null) {
                 actionListener.onConfirmClick(appointment);
@@ -109,7 +110,13 @@ public class AppointmentAdapter extends RecyclerView.Adapter<AppointmentAdapter.
             }
         });
 
-        // Set item click listener for detail view
+        holder.btnReschedule.setOnClickListener(v -> {
+            if (actionListener != null) {
+                actionListener.onRescheduleClick(appointment);
+            }
+        });
+
+
         holder.itemView.setOnClickListener(v -> {
             if (actionListener != null) {
                 actionListener.onItemClick(appointment);
@@ -117,33 +124,44 @@ public class AppointmentAdapter extends RecyclerView.Adapter<AppointmentAdapter.
         });
     }
 
-    /**
-     * Get total number of items
-     */
+
     @Override
     public int getItemCount() {
         return appointmentList.size();
     }
 
-    /**
-     * Update the adapter with a new list
-     */
+
     public void updateList(List<Appointment> newList) {
         this.appointmentList = newList;
         notifyDataSetChanged();
     }
 
-    /**
-     * ViewHolder class for appointment items
-     */
+
+    public void removeItem(int position) {
+        if (position >= 0 && position < appointmentList.size()) {
+            appointmentList.remove(position);
+            notifyItemRemoved(position);
+            notifyItemRangeChanged(position, appointmentList.size());
+        }
+    }
+
+
+    public Appointment getItem(int position) {
+        if (position >= 0 && position < appointmentList.size()) {
+            return appointmentList.get(position);
+        }
+        return null;
+    }
+
+
     public static class AppointmentViewHolder extends RecyclerView.ViewHolder {
         TextView tvPatientName, tvEmail, tvPhone, tvDateTime, tvStatus;
-        Button btnConfirm, btnCancel;
+        Button btnConfirm, btnCancel, btnReschedule;
 
         public AppointmentViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            // Initialize UI components
+
             tvPatientName = itemView.findViewById(R.id.tvPatientName);
             tvEmail = itemView.findViewById(R.id.tvEmail);
             tvPhone = itemView.findViewById(R.id.tvPhone);
@@ -151,7 +169,7 @@ public class AppointmentAdapter extends RecyclerView.Adapter<AppointmentAdapter.
             tvStatus = itemView.findViewById(R.id.tvStatus);
             btnConfirm = itemView.findViewById(R.id.btnConfirm);
             btnCancel = itemView.findViewById(R.id.btnCancel);
+            btnReschedule = itemView.findViewById(R.id.btnReschedule);
         }
     }
 }
-

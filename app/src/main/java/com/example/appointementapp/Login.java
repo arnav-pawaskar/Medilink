@@ -14,10 +14,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-/**
- * Login Activity - Handles user authentication with Firebase
- * Redirects to Admin dashboard or Book Appointment screen based on user role
- */
+
+ // Handles user authentication with Firebase
+
 public class Login extends AppCompatActivity {
 
     // UI Components
@@ -25,10 +24,10 @@ public class Login extends AppCompatActivity {
     private Button btnLogin, btnRegister;
     private ProgressBar progressBar;
 
-    // Firebase Authentication
+
     private FirebaseAuth mAuth;
 
-    // Admin email constant
+
     private static final String ADMIN_EMAIL = "admin@gmail.com";
 
     @Override
@@ -36,19 +35,16 @@ public class Login extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Initialize Firebase Auth
+
         mAuth = FirebaseAuth.getInstance();
 
-        // Initialize UI components
+
         initializeViews();
 
-        // Set click listeners
         setupClickListeners();
     }
 
-    /**
-     * Initialize all UI components
-     */
+
     private void initializeViews() {
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
@@ -57,9 +53,7 @@ public class Login extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
     }
 
-    /**
-     * Setup click listeners for buttons
-     */
+
     private void setupClickListeners() {
         // Login button click
         btnLogin.setOnClickListener(v -> loginUser());
@@ -72,14 +66,13 @@ public class Login extends AppCompatActivity {
         });
     }
 
-    /**
-     * Validate inputs and authenticate user with Firebase
-     */
+    //Validate inputs and authenticate user with Firebase
+
     private void loginUser() {
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
 
-        // Validate inputs
+
         if (TextUtils.isEmpty(email)) {
             etEmail.setError("Email is required");
             etEmail.requestFocus();
@@ -104,7 +97,6 @@ public class Login extends AppCompatActivity {
             return;
         }
 
-        // Show progress bar and disable button
         progressBar.setVisibility(View.VISIBLE);
         btnLogin.setEnabled(false);
 
@@ -115,28 +107,28 @@ public class Login extends AppCompatActivity {
                     btnLogin.setEnabled(true);
 
                     if (task.isSuccessful()) {
-                        // Login successful
+
                         Toast.makeText(Login.this, "Login successful!", Toast.LENGTH_SHORT).show();
 
-                        // Check if user is admin
+
                         if (email.equals(ADMIN_EMAIL)) {
-                            // Navigate to Admin dashboard
+
                             Intent intent = new Intent(Login.this, Admin.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
                         } else {
-                            // Navigate to Book Appointment screen
+
                             Intent intent = new Intent(Login.this, BookAppointment.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
                         }
                         finish();
                     } else {
-                        // Login failed - get detailed error
+
                         Exception exception = task.getException();
                         String errorMessage = exception != null ? exception.getMessage() : "Unknown error";
 
-                        // Check for specific error types
+
                         if (errorMessage != null && errorMessage.contains("user not found")) {
                             Toast.makeText(Login.this, "User not found. Please register first.", Toast.LENGTH_LONG).show();
                         } else if (errorMessage != null && errorMessage.contains("password is invalid")) {
@@ -152,15 +144,14 @@ public class Login extends AppCompatActivity {
                 });
     }
 
-    /**
-     * Check if user is already logged in
-     */
+
+     //Check if user is already logged in
+
     @Override
     protected void onStart() {
         super.onStart();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
-            // User already logged in, redirect accordingly
             String email = currentUser.getEmail();
             if (email != null && email.equals(ADMIN_EMAIL)) {
                 startActivity(new Intent(Login.this, Admin.class));

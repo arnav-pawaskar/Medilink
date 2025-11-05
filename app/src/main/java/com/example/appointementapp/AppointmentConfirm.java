@@ -17,22 +17,19 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.auth.FirebaseAuth;
 
-/**
- * Appointment Confirmation Activity
- * Displays confirmed appointment details and provides access to AI chatbot
- */
+// Appointment Confirmation Activity
+
 public class AppointmentConfirm extends AppCompatActivity {
 
-    // UI Components
     private TextView tvPatientName, tvEmail, tvPhone, tvDate, tvTime;
     private Button btnChatbot, btnLogout;
     private ProgressBar progressBar;
 
-    // Firebase components
+
     private DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
 
-    // Appointment data
+
     private String appointmentId;
     private Appointment currentAppointment;
 
@@ -41,31 +38,29 @@ public class AppointmentConfirm extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_appointment_confirm);
 
-        // Initialize Firebase
+
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
 
-        // Initialize UI components
         initializeViews();
 
-        // Get appointment ID from intent
+
         appointmentId = getIntent().getStringExtra("appointmentId");
 
         if (appointmentId != null) {
-            // Fetch appointment details from Firebase
+
             fetchAppointmentDetails();
         } else {
             Toast.makeText(this, "Error: Appointment ID not found", Toast.LENGTH_SHORT).show();
             finish();
         }
 
-        // Setup click listeners
+
         setupClickListeners();
     }
 
-    /**
-     * Initialize all UI components
-     */
+
+
     private void initializeViews() {
         tvPatientName = findViewById(R.id.tvPatientName);
         tvEmail = findViewById(R.id.tvEmail);
@@ -77,17 +72,14 @@ public class AppointmentConfirm extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
     }
 
-    /**
-     * Setup click listeners for buttons
-     */
+
     private void setupClickListeners() {
         btnChatbot.setOnClickListener(v -> launchChatbot());
         btnLogout.setOnClickListener(v -> logout());
     }
 
-    /**
-     * Fetch appointment details from Firebase Realtime Database
-     */
+    // Fetch appointment details from Firebase Realtime Database
+
     private void fetchAppointmentDetails() {
         progressBar.setVisibility(View.VISIBLE);
 
@@ -119,26 +111,24 @@ public class AppointmentConfirm extends AppCompatActivity {
         );
     }
 
-    /**
-     * Display fetched appointment details in UI
-     */
+    //Display fetched appointment details in UI
+
     private void displayAppointmentDetails() {
-        // Set patient information (values only, labels are in layout)
+
         tvPatientName.setText(currentAppointment.getUserName());
         tvEmail.setText(currentAppointment.getUserEmail());
         tvPhone.setText(currentAppointment.getPhoneNumber());
 
-        // Set appointment details
+
         tvDate.setText(currentAppointment.getDate());
         tvTime.setText(currentAppointment.getTime());
 
-        // Enable chatbot button
+
         btnChatbot.setEnabled(true);
     }
 
-    /**
-     * Launch Chatbot Activity with appointment data
-     */
+    // Launch Chatbot Activity with appointment data
+
     private void launchChatbot() {
         if (currentAppointment != null) {
             Intent intent = new Intent(AppointmentConfirm.this, Chatbot.class);
@@ -153,9 +143,7 @@ public class AppointmentConfirm extends AppCompatActivity {
         }
     }
 
-    /**
-     * Handle logout functionality
-     */
+
     private void logout() {
         mAuth.signOut();
         Intent intent = new Intent(AppointmentConfirm.this, Login.class);
@@ -164,9 +152,7 @@ public class AppointmentConfirm extends AppCompatActivity {
         finish();
     }
 
-    /**
-     * Check if user is still logged in
-     */
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -176,9 +162,7 @@ public class AppointmentConfirm extends AppCompatActivity {
         }
     }
 
-    /**
-     * Handle back button press
-     */
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();

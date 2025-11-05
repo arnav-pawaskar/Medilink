@@ -7,10 +7,9 @@ import android.os.Looper;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-/**
- * MainActivity - Splash Screen
- * Shows app branding and redirects to Login screen after delay
- */
+
+
+
 public class MainActivity extends AppCompatActivity {
 
     private static final int SPLASH_DELAY = 1800;
@@ -20,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Delay and redirect to Login screen
+
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             Intent intent = new Intent(MainActivity.this, Login.class);
             startActivity(intent);

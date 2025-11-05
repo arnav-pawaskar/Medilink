@@ -29,10 +29,7 @@
     <!-- Default state -->
     <item>
         <shape android:shape="rectangle">
-            <gradient
-                android:startColor="@color/primary"
-                android:endColor="@color/primary_dark"
-                android:angle="135" />
+            <solid android:color="@color/primary" />
             <corners android:radius="16dp" />
             <padding
                 android:left="16dp"

@@ -23,29 +23,23 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * Book Appointment Activity - Handles comprehensive appointment booking form
- * Collects patient information including medical history and appointment preferences
- */
+// Book Appointment Activity - Handles comprehensive appointment booking form
+
 public class BookAppointment extends AppCompatActivity {
 
-    // UI Components
     private EditText etPatientName, etEmail, etPhoneNumber, etBloodGroup;
     private EditText etPastProblems, etFamilyHistory, etCurrentProblem;
     private Button btnSelectDate, btnSelectTime, btnSubmitAppointment, btnLogout;
     private ProgressBar progressBar;
 
-    // Firebase components
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
     private FirebaseUser currentUser;
 
-    // Date and Time variables
     private String selectedDate = "";
     private String selectedTime = "";
     private Calendar calendar;
 
-    // Constants
     private static final int MIN_PHONE_LENGTH = 10;
     private static final int MAX_PHONE_LENGTH = 15;
 
@@ -54,29 +48,22 @@ public class BookAppointment extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_appointment);
 
-        // Initialize Firebase
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         currentUser = mAuth.getCurrentUser();
-
-        // Initialize calendar
         calendar = Calendar.getInstance();
 
-        // Initialize UI components
         initializeViews();
 
-        // Set up click listeners
         setupClickListeners();
 
-        // Pre-populate email if available
+
         if (currentUser != null && currentUser.getEmail() != null) {
             etEmail.setText(currentUser.getEmail());
         }
     }
 
-    /**
-     * Initialize all UI components by binding them from layout
-     */
+
     private void initializeViews() {
         etPatientName = findViewById(R.id.etPatientName);
         etEmail = findViewById(R.id.etEmail);
@@ -92,9 +79,7 @@ public class BookAppointment extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
     }
 
-    /**
-     * Setup click listeners for buttons
-     */
+
     private void setupClickListeners() {
         btnSelectDate.setOnClickListener(v -> showDatePickerDialog());
         btnSelectTime.setOnClickListener(v -> showTimePickerDialog());
@@ -102,9 +87,8 @@ public class BookAppointment extends AppCompatActivity {
         btnLogout.setOnClickListener(v -> logout());
     }
 
-    /**
-     * Display DatePickerDialog to select appointment date
-     */
+    // Display DatePickerDialog to select appointment date
+
     private void showDatePickerDialog() {
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
@@ -126,9 +110,8 @@ public class BookAppointment extends AppCompatActivity {
         datePickerDialog.show();
     }
 
-    /**
-     * Display TimePickerDialog to select appointment time
-     */
+    //Display TimePickerDialog to select appointment time
+
     private void showTimePickerDialog() {
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
@@ -140,15 +123,14 @@ public class BookAppointment extends AppCompatActivity {
                     btnSelectTime.setText("Time: " + selectedTime);
                     btnSelectTime.setTextColor(getResources().getColor(android.R.color.black));
                 },
-                hour, minute, true // 24-hour format
+                hour, minute, true
         );
 
         timePickerDialog.show();
     }
 
-    /**
-     * Validate all form inputs before submission
-     */
+    //Validate all form inputs before submission
+
     private boolean validateInputs() {
         String patientName = etPatientName.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
@@ -158,14 +140,14 @@ public class BookAppointment extends AppCompatActivity {
         String familyHistory = etFamilyHistory.getText().toString().trim();
         String currentProblem = etCurrentProblem.getText().toString().trim();
 
-        // Validate patient name
+
         if (TextUtils.isEmpty(patientName)) {
             etPatientName.setError("Patient name is required");
             etPatientName.requestFocus();
             return false;
         }
 
-        // Validate email
+
         if (TextUtils.isEmpty(email)) {
             etEmail.setError("Email is required");
             etEmail.requestFocus();
@@ -178,7 +160,7 @@ public class BookAppointment extends AppCompatActivity {
             return false;
         }
 
-        // Validate phone number
+
         if (TextUtils.isEmpty(phoneNumber)) {
             etPhoneNumber.setError("Phone number is required");
             etPhoneNumber.requestFocus();
@@ -197,27 +179,27 @@ public class BookAppointment extends AppCompatActivity {
             return false;
         }
 
-        // Validate blood group
+
         if (TextUtils.isEmpty(bloodGroup)) {
             etBloodGroup.setError("Blood group is required");
             etBloodGroup.requestFocus();
             return false;
         }
 
-        // Validate current problem
+
         if (TextUtils.isEmpty(currentProblem)) {
             etCurrentProblem.setError("Please describe your current problem");
             etCurrentProblem.requestFocus();
             return false;
         }
 
-        // Validate date selection
+
         if (TextUtils.isEmpty(selectedDate)) {
             Toast.makeText(this, "Please select an appointment date", Toast.LENGTH_SHORT).show();
             return false;
         }
 
-        // Validate time selection
+
         if (TextUtils.isEmpty(selectedTime)) {
             Toast.makeText(this, "Please select an appointment time", Toast.LENGTH_SHORT).show();
             return false;
@@ -226,9 +208,8 @@ public class BookAppointment extends AppCompatActivity {
         return true;
     }
 
-    /**
-     * Submit appointment to Firebase Realtime Database
-     */
+    // Submit appointment to Firebase Realtime Database
+
     private void submitAppointment() {
         // Validate all inputs first
         if (!validateInputs()) {
