@@ -291,10 +291,10 @@
                     android:layout_height="56dp"
                     android:text="Select Date"
                     android:textSize="15sp"
-                    android:textColor="@color/primary"
+                    android:textColor="@color/white"
                     android:background="@drawable/button_outlined"
-                    android:drawableEnd="@android:drawable/ic_menu_my_calendar"
                     android:gravity="center"
+                    android:stateListAnimator="@null"
                     android:layout_marginBottom="16dp" />
 
                 <!-- Time Picker -->
@@ -313,10 +313,10 @@
                     android:layout_height="56dp"
                     android:text="Select Time"
                     android:textSize="15sp"
-                    android:textColor="@color/primary"
+                    android:textColor="@color/white"
                     android:background="@drawable/button_outlined"
-                    android:drawableEnd="@android:drawable/ic_menu_recent_history"
                     android:gravity="center"
+                    android:stateListAnimator="@null"
                     android:layout_marginBottom="24dp" />
 
                 <!-- Submit Button -->
@@ -329,6 +329,7 @@
                     android:textStyle="bold"
                     android:textColor="@color/white"
                     android:background="@drawable/rounded_button"
+                    android:stateListAnimator="@null"
                     android:elevation="3dp" />
 
                 <!-- Progress Bar -->

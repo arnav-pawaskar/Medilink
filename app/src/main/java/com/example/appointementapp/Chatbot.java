@@ -41,7 +41,7 @@ public class Chatbot extends AppCompatActivity {
     private ScrollView svMessages;
     private LinearLayout llMessages;
     private EditText etMessage;
-    private Button btnSend, btnBack, btnLogout;
+    private Button btnSend, btnBack;
     private ProgressBar progressBar;
     private TextView tvChatTitle;
 
@@ -111,7 +111,6 @@ public class Chatbot extends AppCompatActivity {
         etMessage = findViewById(R.id.etMessage);
         btnSend = findViewById(R.id.btnSend);
         btnBack = findViewById(R.id.btnBack);
-        btnLogout = findViewById(R.id.btnLogout);
         progressBar = findViewById(R.id.progressBar);
         tvChatTitle = findViewById(R.id.tvChatTitle);
     }
@@ -130,8 +129,10 @@ public class Chatbot extends AppCompatActivity {
         problemDescription = intent.getStringExtra("problemDescription");
 
         // Set title with patient name
-        if (patientName != null) {
+        if (patientName != null && !patientName.isEmpty()) {
             tvChatTitle.setText("Chat with AI - " + patientName);
+        } else {
+            tvChatTitle.setText("Chat with AI");
         }
     }
 
@@ -141,7 +142,6 @@ public class Chatbot extends AppCompatActivity {
     private void setupClickListeners() {
         btnSend.setOnClickListener(v -> sendMessage());
         btnBack.setOnClickListener(v -> finish());
-        btnLogout.setOnClickListener(v -> logout());
     }
 
     /**
@@ -347,45 +347,50 @@ public class Chatbot extends AppCompatActivity {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        containerParams.setMargins(0, 6, 0, 6);
+        // More generous vertical spacing between messages
+        containerParams.setMargins(0, 8, 0, 8);
         messageContainer.setLayoutParams(containerParams);
         messageContainer.setGravity(isFromUser ? Gravity.END : Gravity.START);
-        messageContainer.setPadding(8, 4, 8, 4);
+        // Horizontal padding for better spacing from screen edges
+        messageContainer.setPadding(isFromUser ? 48 : 8, 0, isFromUser ? 8 : 48, 0);
 
         // Create the message bubble
         androidx.cardview.widget.CardView cardView = new androidx.cardview.widget.CardView(this);
-        cardView.setRadius(12);
-        cardView.setCardElevation(2);
+        // More rounded corners for modern look
+        cardView.setRadius(20);
+        // Subtle elevation
+        cardView.setCardElevation(1);
 
-        // Calculate max width (75% of screen width)
-        int maxWidth = (int) (getResources().getDisplayMetrics().widthPixels * 0.75);
+        // Calculate max width (80% of screen width for better readability)
+        int maxWidth = (int) (getResources().getDisplayMetrics().widthPixels * 0.80);
 
         LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        cardParams.weight = 0;
         cardView.setLayoutParams(cardParams);
 
-        // Set background color based on sender
+        // Set background color based on sender - matching modern chat apps
         if (isFromUser) {
-            cardView.setCardBackgroundColor(0xFF1E3A8A); // Dark blue for user
+            cardView.setCardBackgroundColor(getResources().getColor(R.color.chat_user_bubble, null));
         } else {
-            cardView.setCardBackgroundColor(0xFFE8F0FE); // Light blue for bot
+            cardView.setCardBackgroundColor(getResources().getColor(R.color.chat_bot_bubble, null));
         }
 
         // Create text view for message
         TextView messageView = new TextView(this);
         messageView.setText(message);
-        messageView.setTextSize(14);
-        messageView.setLineSpacing(1.2f, 1.0f);
-        messageView.setPadding(12, 8, 12, 8);
+        messageView.setTextSize(15);
+        messageView.setLineSpacing(4f, 1.0f);
+        // More generous padding inside message bubble
+        messageView.setPadding(20, 14, 20, 14);
         messageView.setMaxWidth(maxWidth);
 
+        // Set text color based on sender
         if (isFromUser) {
-            messageView.setTextColor(0xFFFFFFFF); // White text for user
+            messageView.setTextColor(getResources().getColor(R.color.chat_user_text, null));
         } else {
-            messageView.setTextColor(0xFF1F2937); // Dark gray text for bot
+            messageView.setTextColor(getResources().getColor(R.color.chat_bot_text, null));
         }
 
         cardView.addView(messageView);
@@ -426,4 +431,3 @@ public class Chatbot extends AppCompatActivity {
         goBackToConfirmation();
     }
 }
-

@@ -2,8 +2,6 @@ package com.example.appointementapp;
 
 /**
  * Appointment Model Class
- * Represents an appointment with all patient and appointment details
- * Used for data serialization/deserialization with Firebase Realtime Database
  */
 public class Appointment {
     private String appointmentId;
@@ -25,9 +23,6 @@ public class Appointment {
     public Appointment() {
     }
 
-    /**
-     * Constructor with all parameters
-     */
     public Appointment(String appointmentId, String userName, String userEmail,
                        String phoneNumber, String bloodGroup, String pastProblems,
                        String familyMedicalHistory, String problemDescription,

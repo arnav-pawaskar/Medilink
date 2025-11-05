@@ -15,7 +15,6 @@ import java.util.List;
 
 /**
  * AppointmentAdapter - Custom RecyclerView adapter for displaying appointments
- * Binds appointment data to CardView items with confirm/cancel action buttons
  */
 public class AppointmentAdapter extends RecyclerView.Adapter<AppointmentAdapter.AppointmentViewHolder> {
 
@@ -30,6 +29,7 @@ public class AppointmentAdapter extends RecyclerView.Adapter<AppointmentAdapter.
         void onConfirmClick(Appointment appointment);
         void onCancelClick(Appointment appointment);
         void onItemClick(Appointment appointment);
+        void onDeleteClick(Appointment appointment, int position);
     }
 
     /**
@@ -134,6 +134,27 @@ public class AppointmentAdapter extends RecyclerView.Adapter<AppointmentAdapter.
     }
 
     /**
+     * Remove item at specific position
+     */
+    public void removeItem(int position) {
+        if (position >= 0 && position < appointmentList.size()) {
+            appointmentList.remove(position);
+            notifyItemRemoved(position);
+            notifyItemRangeChanged(position, appointmentList.size());
+        }
+    }
+
+    /**
+     * Get appointment at specific position
+     */
+    public Appointment getItem(int position) {
+        if (position >= 0 && position < appointmentList.size()) {
+            return appointmentList.get(position);
+        }
+        return null;
+    }
+
+    /**
      * ViewHolder class for appointment items
      */
     public static class AppointmentViewHolder extends RecyclerView.ViewHolder {
@@ -154,4 +175,3 @@ public class AppointmentAdapter extends RecyclerView.Adapter<AppointmentAdapter.
         }
     }
 }
-

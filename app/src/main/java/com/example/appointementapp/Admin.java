@@ -1,6 +1,7 @@
 package com.example.appointementapp;
 
 import android.content.Intent;
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -11,7 +12,10 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -27,8 +31,6 @@ import java.util.List;
 
 /**
  * Admin Dashboard Activity
- * Allows admins to view, search, confirm, and cancel appointments
- * Real-time updates from Firebase Realtime Database
  */
 public class Admin extends AppCompatActivity implements AppointmentAdapter.OnAppointmentActionListener {
 
@@ -94,6 +96,65 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
         adapter = new AppointmentAdapter(this, filteredList, this);
         rvAppointments.setLayoutManager(new LinearLayoutManager(this));
         rvAppointments.setAdapter(adapter);
+
+        // Setup swipe-to-delete for cancelled appointments
+        setupSwipeToDelete();
+    }
+
+    /**
+     * Setup swipe-to-delete functionality using ItemTouchHelper
+     */
+    private void setupSwipeToDelete() {
+        ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder,
+                                @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                Appointment appointment = adapter.getItem(position);
+
+                if (appointment != null && "cancelled".equalsIgnoreCase(appointment.getStatus())) {
+                    // Show confirmation dialog before deleting
+                    showDeleteConfirmationDialog(appointment, position);
+                } else {
+                    // Not a cancelled appointment, restore the item
+                    adapter.notifyItemChanged(position);
+                    Toast.makeText(Admin.this, "Only cancelled appointments can be deleted", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public int getSwipeDirs(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+                int position = viewHolder.getAdapterPosition();
+                Appointment appointment = adapter.getItem(position);
+
+                // Only allow swipe for cancelled appointments
+                if (appointment != null && "cancelled".equalsIgnoreCase(appointment.getStatus())) {
+                    return super.getSwipeDirs(recyclerView, viewHolder);
+                }
+                return 0;
+            }
+
+            @Override
+            public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView,
+                                  @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY,
+                                  int actionState, boolean isCurrentlyActive) {
+                // Only show swipe if it's a cancelled appointment
+                int position = viewHolder.getAdapterPosition();
+                Appointment appointment = adapter.getItem(position);
+
+                if (appointment != null && "cancelled".equalsIgnoreCase(appointment.getStatus())) {
+                    super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                }
+            }
+        };
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
+        itemTouchHelper.attachToRecyclerView(rvAppointments);
     }
 
     /**
@@ -148,7 +209,6 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
 
     /**
      * Load all appointments from Firebase Realtime Database
-     * Implements real-time updates using ValueEventListener
      */
     private void loadAppointments() {
         progressBar.setVisibility(View.VISIBLE);
@@ -200,7 +260,6 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
 
     /**
      * Handle confirm appointment action
-     * Updates appointment status to "confirmed" in Firebase
      */
     @Override
     public void onConfirmClick(Appointment appointment) {
@@ -224,7 +283,6 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
 
     /**
      * Handle cancel appointment action
-     * Updates appointment status to "cancelled" in Firebase
      */
     @Override
     public void onCancelClick(Appointment appointment) {
@@ -248,12 +306,74 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
 
     /**
      * Handle appointment item click
-     * Can be used for viewing detailed appointment information
      */
     @Override
     public void onItemClick(Appointment appointment) {
         // Optional: Navigate to detailed view
         Toast.makeText(this, "Appointment: " + appointment.getUserName(), Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Handle delete appointment action
+     */
+    @Override
+    public void onDeleteClick(Appointment appointment, int position) {
+        showDeleteConfirmationDialog(appointment, position);
+    }
+
+    /**
+     * Show confirmation dialog before deleting appointment
+     */
+    private void showDeleteConfirmationDialog(Appointment appointment, int position) {
+        new AlertDialog.Builder(this)
+                .setTitle("Delete Appointment")
+                .setMessage("Are you sure you want to permanently delete this cancelled appointment for " +
+                        appointment.getUserName() + "?")
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    deleteAppointment(appointment, position);
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    // Restore the item if user cancels
+                    adapter.notifyItemChanged(position);
+                    dialog.dismiss();
+                })
+                .setCancelable(false)
+                .show();
+    }
+
+    /**
+     * Delete appointment from Firebase and update UI
+     */
+    private void deleteAppointment(Appointment appointment, int position) {
+        if (appointment.getAppointmentId() == null) {
+            Toast.makeText(this, "Error: Invalid appointment ID", Toast.LENGTH_SHORT).show();
+            adapter.notifyItemChanged(position);
+            return;
+        }
+
+        progressBar.setVisibility(View.VISIBLE);
+
+        mDatabase.child("Appointments").child(appointment.getAppointmentId())
+                .removeValue()
+                .addOnSuccessListener(aVoid -> {
+                    progressBar.setVisibility(View.GONE);
+
+                    // Remove from both lists
+                    appointmentList.remove(appointment);
+                    filteredList.remove(appointment);
+
+                    // Notify adapter
+                    adapter.notifyItemRemoved(position);
+                    adapter.notifyItemRangeChanged(position, filteredList.size());
+
+                    Toast.makeText(Admin.this, "Appointment deleted successfully", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    progressBar.setVisibility(View.GONE);
+                    adapter.notifyItemChanged(position);
+                    Toast.makeText(Admin.this, "Error deleting appointment: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                });
     }
 
     /**
@@ -279,9 +399,7 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
         }
     }
 
-    /**
-     * Remove event listener when activity is destroyed to prevent memory leaks
-     */
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -290,4 +408,3 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
         }
     }
 }
-
