@@ -16,7 +16,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 
-// Register Activity - Handles user account creation with Firebase
 
 public class Register extends AppCompatActivity {
 
@@ -69,8 +68,6 @@ public class Register extends AppCompatActivity {
         });
     }
 
-
-     //Validate all inputs and create new user account with Firebase
 
     private void registerUser() {
         String email = etEmail.getText().toString().trim();

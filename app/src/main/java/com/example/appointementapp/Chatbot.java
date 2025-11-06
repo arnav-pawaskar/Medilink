@@ -30,11 +30,11 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-// Chatbot Activity - AI-powered medical assistant
+
 
 public class Chatbot extends AppCompatActivity {
 
-    // UI Components
+
     private ScrollView svMessages;
     private LinearLayout llMessages;
     private EditText etMessage;
@@ -133,8 +133,6 @@ public class Chatbot extends AppCompatActivity {
         btnBack.setOnClickListener(v -> finish());
     }
 
-    //Load Gemini API key from strings.xml
-
     private void loadGeminiApiKey() {
         // Get API key from strings.xml
         geminiApiKey = getString(R.string.gemini_api_key);
@@ -161,7 +159,7 @@ public class Chatbot extends AppCompatActivity {
         addMessageToUI(welcomeText, false);
     }
 
-    // Send user message and get AI response
+
 
     private void sendMessage() {
         String userMessage = etMessage.getText().toString().trim();
@@ -212,12 +210,9 @@ public class Chatbot extends AppCompatActivity {
         }).start();
     }
 
-    // Call Google Gemini API with medical context
-
     private String callGeminiAPI(String userMessage) throws IOException, JSONException {
         OkHttpClient client = new OkHttpClient();
 
-        // Build system prompt with patient context
         String systemPrompt = "You are an AI healthcare assistant for an online diagnostic platform. " +
                 "Patient Information:\n" +
                 "- Name: " + patientName + "\n" +
@@ -374,9 +369,6 @@ public class Chatbot extends AppCompatActivity {
         svMessages.post(() -> svMessages.fullScroll(View.FOCUS_DOWN));
     }
 
-    /**
-     * Go back to appointment confirmation screen
-     */
     private void goBackToConfirmation() {
         Intent intent = new Intent(Chatbot.this, AppointmentConfirm.class);
         intent.putExtra("appointmentId", appointmentId);
@@ -393,9 +385,4 @@ public class Chatbot extends AppCompatActivity {
     }
 
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        goBackToConfirmation();
-    }
 }

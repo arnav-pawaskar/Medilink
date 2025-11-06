@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -63,6 +64,14 @@ public class AppointmentAdapter extends RecyclerView.Adapter<AppointmentAdapter.
 
         holder.tvDateTime.setText(appointment.getDate() + " | " + appointment.getTime());
 
+        // Display specialist if available
+        String specialist = appointment.getRecommendedSpecialist();
+        if (specialist != null && !specialist.isEmpty()) {
+            holder.tvSpecialist.setText(specialist);
+            holder.llSpecialistContainer.setVisibility(View.VISIBLE);
+        } else {
+            holder.llSpecialistContainer.setVisibility(View.GONE);
+        }
 
         String status = appointment.getStatus() != null ? appointment.getStatus() : "pending";
         holder.tvStatus.setText("● " + status.substring(0, 1).toUpperCase() + status.substring(1));
@@ -155,8 +164,9 @@ public class AppointmentAdapter extends RecyclerView.Adapter<AppointmentAdapter.
 
 
     public static class AppointmentViewHolder extends RecyclerView.ViewHolder {
-        TextView tvPatientName, tvEmail, tvPhone, tvDateTime, tvStatus;
+        TextView tvPatientName, tvEmail, tvPhone, tvDateTime, tvStatus, tvSpecialist;
         Button btnConfirm, btnCancel, btnReschedule;
+        LinearLayout llSpecialistContainer;
 
         public AppointmentViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -167,6 +177,8 @@ public class AppointmentAdapter extends RecyclerView.Adapter<AppointmentAdapter.
             tvPhone = itemView.findViewById(R.id.tvPhone);
             tvDateTime = itemView.findViewById(R.id.tvDateTime);
             tvStatus = itemView.findViewById(R.id.tvStatus);
+            tvSpecialist = itemView.findViewById(R.id.tvSpecialist);
+            llSpecialistContainer = itemView.findViewById(R.id.llSpecialistContainer);
             btnConfirm = itemView.findViewById(R.id.btnConfirm);
             btnCancel = itemView.findViewById(R.id.btnCancel);
             btnReschedule = itemView.findViewById(R.id.btnReschedule);

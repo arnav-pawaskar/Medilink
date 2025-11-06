@@ -15,6 +15,7 @@ public class Appointment {
     private String time;
     private String userId;
     private String status;
+    private String recommendedSpecialist;
 
 
     public Appointment() {
@@ -36,6 +37,7 @@ public class Appointment {
         this.time = time;
         this.userId = userId;
         this.status = status;
+        this.recommendedSpecialist = "";
     }
 
     // Getters and Setters
@@ -134,6 +136,14 @@ public class Appointment {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getRecommendedSpecialist() {
+        return recommendedSpecialist;
+    }
+
+    public void setRecommendedSpecialist(String recommendedSpecialist) {
+        this.recommendedSpecialist = recommendedSpecialist;
     }
 
 

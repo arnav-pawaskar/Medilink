@@ -257,7 +257,59 @@
                     android:textColor="@color/text_primary"
                     android:textColorHint="@color/text_tertiary"
                     android:gravity="top"
-                    android:layout_marginBottom="24dp" />
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Find Specialist Button -->
+                <Button
+                    android:id="@+id/btnFindSpecialist"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:text="🔍 Find Suitable Specialist"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:background="@drawable/rounded_button"
+                    android:stateListAnimator="@null"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Specialist Recommendation Card -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cvSpecialistRecommendation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="@color/success_light"
+                    android:layout_marginBottom="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Recommended Specialist"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/success"
+                            android:layout_marginBottom="8dp" />
+
+                        <TextView
+                            android:id="@+id/tvSpecialistRecommendation"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text=""
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_primary" />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
 
                 <!-- Appointment Details Section -->
                 <View

@@ -163,10 +163,5 @@ public class AppointmentConfirm extends AppCompatActivity {
     }
 
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        finish();
-    }
 }
 

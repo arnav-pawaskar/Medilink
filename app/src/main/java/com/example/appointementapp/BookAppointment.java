@@ -10,8 +10,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -23,21 +25,24 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-// Book Appointment Activity - Handles comprehensive appointment booking form
 
 public class BookAppointment extends AppCompatActivity {
 
     private EditText etPatientName, etEmail, etPhoneNumber, etBloodGroup;
     private EditText etPastProblems, etFamilyHistory, etCurrentProblem;
-    private Button btnSelectDate, btnSelectTime, btnSubmitAppointment, btnLogout;
+    private Button btnSelectDate, btnSelectTime, btnSubmitAppointment, btnLogout, btnFindSpecialist;
     private ProgressBar progressBar;
+    private CardView cvSpecialistRecommendation;
+    private TextView tvSpecialistRecommendation;
 
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
     private FirebaseUser currentUser;
+    private GeminiApiHelper geminiApiHelper;
 
     private String selectedDate = "";
     private String selectedTime = "";
+    private String recommendedSpecialist = "";
     private Calendar calendar;
 
     private static final int MIN_PHONE_LENGTH = 10;
@@ -52,6 +57,7 @@ public class BookAppointment extends AppCompatActivity {
         mDatabase = FirebaseDatabase.getInstance().getReference();
         currentUser = mAuth.getCurrentUser();
         calendar = Calendar.getInstance();
+        geminiApiHelper = new GeminiApiHelper(this);
 
         initializeViews();
 
@@ -76,7 +82,10 @@ public class BookAppointment extends AppCompatActivity {
         btnSelectTime = findViewById(R.id.btnSelectTime);
         btnSubmitAppointment = findViewById(R.id.btnSubmitAppointment);
         btnLogout = findViewById(R.id.btnLogout);
+        btnFindSpecialist = findViewById(R.id.btnFindSpecialist);
         progressBar = findViewById(R.id.progressBar);
+        cvSpecialistRecommendation = findViewById(R.id.cvSpecialistRecommendation);
+        tvSpecialistRecommendation = findViewById(R.id.tvSpecialistRecommendation);
     }
 
 
@@ -85,9 +94,9 @@ public class BookAppointment extends AppCompatActivity {
         btnSelectTime.setOnClickListener(v -> showTimePickerDialog());
         btnSubmitAppointment.setOnClickListener(v -> submitAppointment());
         btnLogout.setOnClickListener(v -> logout());
+        btnFindSpecialist.setOnClickListener(v -> findSuitableSpecialist());
     }
 
-    // Display DatePickerDialog to select appointment date
 
     private void showDatePickerDialog() {
         int year = calendar.get(Calendar.YEAR);
@@ -105,12 +114,9 @@ public class BookAppointment extends AppCompatActivity {
                 year, month, day
         );
 
-        // Set minimum date to today
         datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
         datePickerDialog.show();
     }
-
-    //Display TimePickerDialog to select appointment time
 
     private void showTimePickerDialog() {
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
@@ -128,8 +134,6 @@ public class BookAppointment extends AppCompatActivity {
 
         timePickerDialog.show();
     }
-
-    //Validate all form inputs before submission
 
     private boolean validateInputs() {
         String patientName = etPatientName.getText().toString().trim();
@@ -208,22 +212,84 @@ public class BookAppointment extends AppCompatActivity {
         return true;
     }
 
+    // Find suitable specialist using Gemini API based on patient information
+
+    private void findSuitableSpecialist() {
+        // Get current values from form
+        String currentProblem = etCurrentProblem.getText().toString().trim();
+        String bloodGroup = etBloodGroup.getText().toString().trim();
+        String pastProblems = etPastProblems.getText().toString().trim();
+        String familyHistory = etFamilyHistory.getText().toString().trim();
+
+        // Validate required fields
+        if (TextUtils.isEmpty(currentProblem)) {
+            etCurrentProblem.setError("Please describe your current problem first");
+            etCurrentProblem.requestFocus();
+            Toast.makeText(this, "Please fill in your current problem to get specialist recommendation", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (TextUtils.isEmpty(bloodGroup)) {
+            etBloodGroup.setError("Blood group is required");
+            etBloodGroup.requestFocus();
+            Toast.makeText(this, "Please enter your blood group", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        progressBar.setVisibility(View.VISIBLE);
+        btnFindSpecialist.setEnabled(false);
+        btnFindSpecialist.setText("Finding Specialist...");
+        cvSpecialistRecommendation.setVisibility(View.GONE);
+
+        geminiApiHelper.getSpecialistRecommendation(
+                currentProblem,
+                bloodGroup,
+                pastProblems,
+                familyHistory,
+                new GeminiApiHelper.GeminiCallback() {
+                    @Override
+                    public void onSuccess(String specialistRecommendation) {
+                        progressBar.setVisibility(View.GONE);
+                        btnFindSpecialist.setEnabled(true);
+                        btnFindSpecialist.setText("Find Suitable Specialist");
+
+                        recommendedSpecialist = specialistRecommendation;
+
+                        tvSpecialistRecommendation.setText(specialistRecommendation);
+                        cvSpecialistRecommendation.setVisibility(View.VISIBLE);
+
+                        Toast.makeText(BookAppointment.this,
+                                "Specialist recommended successfully!",
+                                Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onError(String errorMessage) {
+                        progressBar.setVisibility(View.GONE);
+                        btnFindSpecialist.setEnabled(true);
+                        btnFindSpecialist.setText("Find Suitable Specialist");
+                        cvSpecialistRecommendation.setVisibility(View.GONE);
+
+                        Toast.makeText(BookAppointment.this,
+                                "Failed to get recommendation: " + errorMessage,
+                                Toast.LENGTH_LONG).show();
+                    }
+                }
+        );
+    }
+
     // Submit appointment to Firebase Realtime Database
 
     private void submitAppointment() {
-        // Validate all inputs first
         if (!validateInputs()) {
             return;
         }
 
-        // Show progress bar and disable submit button
         progressBar.setVisibility(View.VISIBLE);
         btnSubmitAppointment.setEnabled(false);
 
-        // Create unique appointment ID
         String appointmentId = UUID.randomUUID().toString();
 
-        // Prepare appointment data
         String patientName = etPatientName.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
         String phoneNumber = etPhoneNumber.getText().toString().trim();
@@ -232,7 +298,6 @@ public class BookAppointment extends AppCompatActivity {
         String familyHistory = etFamilyHistory.getText().toString().trim();
         String currentProblem = etCurrentProblem.getText().toString().trim();
 
-        // Create appointment map
         Map<String, Object> appointmentData = new HashMap<>();
         appointmentData.put("appointmentId", appointmentId);
         appointmentData.put("userName", patientName);
@@ -246,17 +311,15 @@ public class BookAppointment extends AppCompatActivity {
         appointmentData.put("time", selectedTime);
         appointmentData.put("userId", currentUser.getUid());
         appointmentData.put("status", "pending"); // New appointments start as pending
+        appointmentData.put("recommendedSpecialist", recommendedSpecialist); // Add specialist recommendation
 
-        // Save to Firebase Realtime Database
         mDatabase.child("Appointments").child(appointmentId).setValue(appointmentData)
                 .addOnSuccessListener(aVoid -> {
                     progressBar.setVisibility(View.GONE);
                     btnSubmitAppointment.setEnabled(true);
 
-                    // Show success message
                     Toast.makeText(BookAppointment.this, "Appointment booked successfully!", Toast.LENGTH_SHORT).show();
 
-                    // Navigate to confirmation screen with appointment ID
                     Intent intent = new Intent(BookAppointment.this, AppointmentConfirm.class);
                     intent.putExtra("appointmentId", appointmentId);
                     startActivity(intent);
@@ -266,15 +329,12 @@ public class BookAppointment extends AppCompatActivity {
                     progressBar.setVisibility(View.GONE);
                     btnSubmitAppointment.setEnabled(true);
 
-                    // Show error message
                     String errorMessage = "Error: " + (e.getMessage() != null ? e.getMessage() : "Failed to book appointment");
                     Toast.makeText(BookAppointment.this, errorMessage, Toast.LENGTH_LONG).show();
                 });
     }
 
-    /**
-     * Handle logout functionality
-     */
+
     private void logout() {
         mAuth.signOut();
         Intent intent = new Intent(BookAppointment.this, Login.class);
@@ -283,9 +343,7 @@ public class BookAppointment extends AppCompatActivity {
         finish();
     }
 
-    /**
-     * Check if user is still logged in
-     */
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -295,13 +353,6 @@ public class BookAppointment extends AppCompatActivity {
         }
     }
 
-    /**
-     * Handle back button press
-     */
-    @Override
-    public void onBackPressed() {
-        // Allow user to go back to previous activity
-        super.onBackPressed();
-    }
+
 }
 

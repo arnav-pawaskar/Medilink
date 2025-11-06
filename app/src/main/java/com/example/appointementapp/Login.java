@@ -19,7 +19,6 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class Login extends AppCompatActivity {
 
-    // UI Components
     private EditText etEmail, etPassword;
     private Button btnLogin, btnRegister;
     private ProgressBar progressBar;
@@ -66,7 +65,6 @@ public class Login extends AppCompatActivity {
         });
     }
 
-    //Validate inputs and authenticate user with Firebase
 
     private void loginUser() {
         String email = etEmail.getText().toString().trim();
@@ -100,7 +98,6 @@ public class Login extends AppCompatActivity {
         progressBar.setVisibility(View.VISIBLE);
         btnLogin.setEnabled(false);
 
-        // Authenticate with Firebase
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     progressBar.setVisibility(View.GONE);
@@ -145,7 +142,6 @@ public class Login extends AppCompatActivity {
     }
 
 
-     //Check if user is already logged in
 
     @Override
     protected void onStart() {

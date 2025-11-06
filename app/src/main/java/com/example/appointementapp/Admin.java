@@ -32,9 +32,9 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 
-// Admin Dashboard Activity
 
 public class Admin extends AppCompatActivity implements AppointmentAdapter.OnAppointmentActionListener {
 
@@ -155,7 +155,6 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
         itemTouchHelper.attachToRecyclerView(rvAppointments);
     }
 
-    // Setup search functionality
 
     private void setupSearchFunctionality() {
         etSearchPatient.addTextChangedListener(new TextWatcher() {
@@ -180,6 +179,7 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
 
         if (searchQuery.isEmpty()) {
             filteredList.addAll(appointmentList);
+
         } else {
             String query = searchQuery.toLowerCase();
             for (Appointment appointment : appointmentList) {
@@ -199,8 +199,6 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
         btnLogout.setOnClickListener(v -> logout());
         btnRefresh.setOnClickListener(v -> loadAppointments());
     }
-
-    //Load all appointments from Firebase Realtime Database
 
     private void loadAppointments() {
         progressBar.setVisibility(View.VISIBLE);
@@ -224,6 +222,11 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
                         }
                     }
 
+                    Collections.sort(appointmentList, (a1, a2) -> {
+                        int priority1 = getStatusPriority(a1.getStatus());
+                        int priority2 = getStatusPriority(a2.getStatus());
+                        return Integer.compare(priority1, priority2);
+                    });
 
                     filteredList.addAll(appointmentList);
                     adapter.notifyDataSetChanged();
@@ -250,7 +253,18 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
         mDatabase.child("Appointments").addValueEventListener(valueEventListener);
     }
 
-    // Handle confirm appointment action
+
+    private int getStatusPriority(String status) {
+        if (status == null || "pending".equalsIgnoreCase(status)) {
+            return 1;
+        } else if ("confirmed".equalsIgnoreCase(status)) {
+            return 2;
+        } else {
+            return 3;
+        }
+    }
+
+
 
     @Override
     public void onConfirmClick(Appointment appointment) {
@@ -272,7 +286,6 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
         }
     }
 
-    // Handle cancel appointment action
 
     @Override
     public void onCancelClick(Appointment appointment) {
@@ -307,7 +320,6 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
         showDeleteConfirmationDialog(appointment, position);
     }
 
-    // Handle reschedule appointment action
     @Override
     public void onRescheduleClick(Appointment appointment) {
         showRescheduleDialog(appointment);
@@ -373,7 +385,6 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
         finish();
     }
 
-    // Show reschedule dialog with date and time pickers
     private void showRescheduleDialog(Appointment appointment) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_reschedule_appointment, null);
@@ -381,7 +392,6 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
 
         AlertDialog dialog = builder.create();
 
-        // Initialize dialog views
         TextView tvPatientInfo = dialogView.findViewById(R.id.tvPatientInfo);
         TextView tvCurrentDateTime = dialogView.findViewById(R.id.tvCurrentDateTime);
         Button btnSelectNewDate = dialogView.findViewById(R.id.btnSelectNewDate);
@@ -389,18 +399,16 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
         Button btnCancelReschedule = dialogView.findViewById(R.id.btnCancelReschedule);
         Button btnConfirmReschedule = dialogView.findViewById(R.id.btnConfirmReschedule);
 
-        // Set current appointment info
         tvPatientInfo.setText("Patient: " + appointment.getUserName());
         tvCurrentDateTime.setText("Current: " + appointment.getDate() + " | " + appointment.getTime());
 
-        // Variables to store new date and time
         final String[] newDate = {""};
         final String[] newTime = {""};
 
-        // Calendar instance for date/time pickers
+
         Calendar calendar = Calendar.getInstance();
 
-        // Date picker
+
         btnSelectNewDate.setOnClickListener(v -> {
             int year = calendar.get(Calendar.YEAR);
             int month = calendar.get(Calendar.MONTH);
@@ -416,12 +424,10 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
                     year, month, day
             );
 
-            // Set minimum date to today
             datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
             datePickerDialog.show();
         });
 
-        // Time picker
         btnSelectNewTime.setOnClickListener(v -> {
             int hour = calendar.get(Calendar.HOUR_OF_DAY);
             int minute = calendar.get(Calendar.MINUTE);
@@ -441,17 +447,14 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
             timePickerDialog.show();
         });
 
-        // Cancel button
         btnCancelReschedule.setOnClickListener(v -> dialog.dismiss());
 
-        // Confirm reschedule button
         btnConfirmReschedule.setOnClickListener(v -> {
             if (newDate[0].isEmpty() || newTime[0].isEmpty()) {
                 Toast.makeText(Admin.this, "Please select both date and time", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            // Update appointment with new date and time
             progressBar.setVisibility(View.VISIBLE);
             appointment.setDate(newDate[0]);
             appointment.setTime(newTime[0]);
