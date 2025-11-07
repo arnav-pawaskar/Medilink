@@ -134,7 +134,6 @@ public class Chatbot extends AppCompatActivity {
     }
 
     private void loadGeminiApiKey() {
-        // Get API key from strings.xml
         geminiApiKey = getString(R.string.gemini_api_key);
 
         if (geminiApiKey == null || geminiApiKey.isEmpty()) {

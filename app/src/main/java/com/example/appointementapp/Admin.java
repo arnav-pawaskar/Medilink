@@ -22,7 +22,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -41,7 +41,8 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
 
     private RecyclerView rvAppointments;
     private EditText etSearchPatient;
-    private Button btnLogout, btnRefresh;
+    private Button btnLogout;
+    private FloatingActionButton btnRefresh;
     private ProgressBar progressBar;
 
 
@@ -112,7 +113,7 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                int position = viewHolder.getAdapterPosition();
+                int position = viewHolder.getBindingAdapterPosition();
                 Appointment appointment = adapter.getItem(position);
 
                 if (appointment != null && "cancelled".equalsIgnoreCase(appointment.getStatus())) {
@@ -127,7 +128,7 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
 
             @Override
             public int getSwipeDirs(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
-                int position = viewHolder.getAdapterPosition();
+                int position = viewHolder.getBindingAdapterPosition();
                 Appointment appointment = adapter.getItem(position);
 
 
@@ -142,7 +143,7 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
                                   @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY,
                                   int actionState, boolean isCurrentlyActive) {
 
-                int position = viewHolder.getAdapterPosition();
+                int position = viewHolder.getBindingAdapterPosition();
                 Appointment appointment = adapter.getItem(position);
 
                 if (appointment != null && "cancelled".equalsIgnoreCase(appointment.getStatus())) {

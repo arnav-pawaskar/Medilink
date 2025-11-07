@@ -78,7 +78,6 @@ public class AppointmentConfirm extends AppCompatActivity {
         btnLogout.setOnClickListener(v -> logout());
     }
 
-    // Fetch appointment details from Firebase Realtime Database
 
     private void fetchAppointmentDetails() {
         progressBar.setVisibility(View.VISIBLE);
@@ -111,7 +110,6 @@ public class AppointmentConfirm extends AppCompatActivity {
         );
     }
 
-    //Display fetched appointment details in UI
 
     private void displayAppointmentDetails() {
 
@@ -127,7 +125,6 @@ public class AppointmentConfirm extends AppCompatActivity {
         btnChatbot.setEnabled(true);
     }
 
-    // Launch Chatbot Activity with appointment data
 
     private void launchChatbot() {
         if (currentAppointment != null) {

@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -109,7 +110,8 @@ public class BookAppointment extends AppCompatActivity {
                     // selectedMonth is 0-indexed, so add 1
                     selectedDate = String.format("%02d/%02d/%04d", selectedDay, selectedMonth + 1, selectedYear);
                     btnSelectDate.setText("Date: " + selectedDate);
-                    btnSelectDate.setTextColor(getResources().getColor(android.R.color.black));
+                    btnSelectDate.setTextColor(ContextCompat.getColor(this, android.R.color.black));
+
                 },
                 year, month, day
         );
@@ -127,7 +129,8 @@ public class BookAppointment extends AppCompatActivity {
                 (view, selectedHour, selectedMinute) -> {
                     selectedTime = String.format("%02d:%02d", selectedHour, selectedMinute);
                     btnSelectTime.setText("Time: " + selectedTime);
-                    btnSelectTime.setTextColor(getResources().getColor(android.R.color.black));
+                    btnSelectTime.setTextColor(ContextCompat.getColor(this, android.R.color.black));
+
                 },
                 hour, minute, true
         );
@@ -212,7 +215,6 @@ public class BookAppointment extends AppCompatActivity {
         return true;
     }
 
-    // Find suitable specialist using Gemini API based on patient information
 
     private void findSuitableSpecialist() {
         // Get current values from form
@@ -221,7 +223,6 @@ public class BookAppointment extends AppCompatActivity {
         String pastProblems = etPastProblems.getText().toString().trim();
         String familyHistory = etFamilyHistory.getText().toString().trim();
 
-        // Validate required fields
         if (TextUtils.isEmpty(currentProblem)) {
             etCurrentProblem.setError("Please describe your current problem first");
             etCurrentProblem.requestFocus();
@@ -278,7 +279,6 @@ public class BookAppointment extends AppCompatActivity {
         );
     }
 
-    // Submit appointment to Firebase Realtime Database
 
     private void submitAppointment() {
         if (!validateInputs()) {

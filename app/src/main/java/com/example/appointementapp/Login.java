@@ -54,12 +54,9 @@ public class Login extends AppCompatActivity {
 
 
     private void setupClickListeners() {
-        // Login button click
         btnLogin.setOnClickListener(v -> loginUser());
 
-        // Register button click
         btnRegister.setOnClickListener(v -> {
-            // Navigate to Register activity
             Intent intent = new Intent(Login.this, Register.class);
             startActivity(intent);
         });

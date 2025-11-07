@@ -57,10 +57,8 @@ public class Register extends AppCompatActivity {
 
 
     private void setupClickListeners() {
-        // Register button click
         btnRegister.setOnClickListener(v -> registerUser());
 
-        // Login button click - navigate back to Login activity
         btnLogin.setOnClickListener(v -> {
             Intent intent = new Intent(Register.this, Login.class);
             startActivity(intent);
@@ -163,7 +161,7 @@ public class Register extends AppCompatActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             String email = currentUser.getEmail();
-            if (email != null && email.equals("admin@vitaltech.com")) {
+            if (email != null && email.equals("admin@gmail.com")) {
                 startActivity(new Intent(Register.this, Admin.class));
             } else {
                 startActivity(new Intent(Register.this, BookAppointment.class));
@@ -172,13 +170,5 @@ public class Register extends AppCompatActivity {
         }
     }
 
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        Intent intent = new Intent(Register.this, Login.class);
-        startActivity(intent);
-        finish();
-    }
 }
 
