@@ -272,9 +272,9 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
         if (appointment.getAppointmentId() != null) {
             progressBar.setVisibility(View.VISIBLE);
 
-            appointment.setStatus("confirmed");
             mDatabase.child("Appointments").child(appointment.getAppointmentId())
-                    .setValue(appointment)
+                    .child("status")
+                    .setValue("confirmed")
                     .addOnSuccessListener(aVoid -> {
                         progressBar.setVisibility(View.GONE);
                         Toast.makeText(Admin.this, "Appointment confirmed!", Toast.LENGTH_SHORT).show();
@@ -293,12 +293,14 @@ public class Admin extends AppCompatActivity implements AppointmentAdapter.OnApp
         if (appointment.getAppointmentId() != null) {
             progressBar.setVisibility(View.VISIBLE);
 
-            appointment.setStatus("cancelled");
+            // Update status in Firebase using child().setValue() for specific field
             mDatabase.child("Appointments").child(appointment.getAppointmentId())
-                    .setValue(appointment)
+                    .child("status")
+                    .setValue("cancelled")
                     .addOnSuccessListener(aVoid -> {
                         progressBar.setVisibility(View.GONE);
                         Toast.makeText(Admin.this, "Appointment cancelled!", Toast.LENGTH_SHORT).show();
+                        // No need to manually update - ValueEventListener will handle it
                     })
                     .addOnFailureListener(e -> {
                         progressBar.setVisibility(View.GONE);

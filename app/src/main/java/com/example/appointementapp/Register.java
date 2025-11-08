@@ -29,6 +29,7 @@ public class Register extends AppCompatActivity {
 
 
     private static final int MIN_PASSWORD_LENGTH = 6;
+    private static final int MAX_PASSWORD_LENGTH = 20;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +95,36 @@ public class Register extends AppCompatActivity {
 
         if (password.length() < MIN_PASSWORD_LENGTH) {
             etPassword.setError("Password must be at least " + MIN_PASSWORD_LENGTH + " characters");
+            etPassword.requestFocus();
+            return;
+        }
+
+        if (password.length() > MAX_PASSWORD_LENGTH) {
+            etPassword.setError("Password must not exceed " + MAX_PASSWORD_LENGTH + " characters");
+            etPassword.requestFocus();
+            return;
+        }
+
+        if (!password.matches(".*[A-Z].*")) {
+            etPassword.setError("Password must contain at least one uppercase letter");
+            etPassword.requestFocus();
+            return;
+        }
+
+        if (!password.matches(".*[a-z].*")) {
+            etPassword.setError("Password must contain at least one lowercase letter");
+            etPassword.requestFocus();
+            return;
+        }
+
+        if (!password.matches(".*\\d.*")) {
+            etPassword.setError("Password must contain at least one number");
+            etPassword.requestFocus();
+            return;
+        }
+
+        if (!password.matches(".*[!@#$%^&*(),.?\":{}|<>].*")) {
+            etPassword.setError("Password must contain at least one special character (!@#$%^&*(),.?\":{}|<>)");
             etPassword.requestFocus();
             return;
         }
