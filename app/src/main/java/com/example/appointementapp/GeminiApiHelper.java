@@ -21,7 +21,7 @@ import okhttp3.Response;
 
 public class GeminiApiHelper {
 
-    private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent";
+    private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent";
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
 
     private final OkHttpClient client;
@@ -47,7 +47,7 @@ public class GeminiApiHelper {
 
     private String loadGeminiApiKey() {
         try {
-            return context.getString(R.string.gemini_api_key);
+            return BuildConfig.GEMINI_API_KEY;
         } catch (Exception e) {
             return null;
         }
@@ -185,4 +185,3 @@ public class GeminiApiHelper {
         return text;
     }
 }
-

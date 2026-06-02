@@ -55,7 +55,7 @@ public class Chatbot extends AppCompatActivity {
     private String problemDescription;
 
 
-    private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent";
+    private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent";
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
 
@@ -134,7 +134,7 @@ public class Chatbot extends AppCompatActivity {
     }
 
     private void loadGeminiApiKey() {
-        geminiApiKey = getString(R.string.gemini_api_key);
+        geminiApiKey = BuildConfig.GEMINI_API_KEY;
 
         if (geminiApiKey == null || geminiApiKey.isEmpty()) {
             Toast.makeText(Chatbot.this, "Error: API key not configured", Toast.LENGTH_SHORT).show();
@@ -191,7 +191,6 @@ public class Chatbot extends AppCompatActivity {
                     btnSend.setEnabled(true);
 
                     if (botResponse != null && !botResponse.isEmpty()) {
-                        // Now add both user message and bot response to history
                         conversationHistory.add(new Message(userMessage, true));
                         conversationHistory.add(new Message(botResponse, false));
                         addMessageToUI(botResponse, false);
@@ -281,7 +280,17 @@ public class Chatbot extends AppCompatActivity {
                 if (response.body() != null) {
                     errorBody = response.body().string();
                 }
-                return "Error: Unable to get response from AI (HTTP " + response.code() + ") - " + errorBody;
+                
+                // Handle specific error codes with user-friendly messages
+                if (response.code() == 429) {
+                    return "⚠️ Rate limit exceeded. The AI service is temporarily unavailable due to high usage. Please wait a few minutes and try again.";
+                } else if (response.code() == 401 || response.code() == 403) {
+                    return "⚠️ API authentication error. Please check your API key configuration.";
+                } else if (response.code() == 500 || response.code() == 503) {
+                    return "⚠️ The AI service is temporarily unavailable. Please try again later.";
+                }
+                
+                return "Error: Unable to get response from AI (HTTP " + response.code() + ")";
             }
 
             String responseBody = response.body().string();

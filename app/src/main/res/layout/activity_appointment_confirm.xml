@@ -16,22 +16,22 @@
             android:layout_width="0dp"
             android:layout_height="220dp"
             android:background="@drawable/header_gradient"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <!-- Success Icon -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cvSuccessIcon"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:layout_marginTop="65dp"
-            app:cardBackgroundColor="@color/success"
+            android:layout_marginTop="60dp"
             app:cardCornerRadius="50dp"
             app:cardElevation="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:cardBackgroundColor="@color/success"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintEnd_toEndOf="parent">
 
             <TextView
                 android:id="@+id/tvSuccessIcon"
@@ -51,16 +51,31 @@
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
             android:text="Appointment Confirmed!"
-            android:textColor="@color/white"
             android:textSize="26sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:textColor="@color/white"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/cvSuccessIcon"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <!-- Subtitle -->
+        <TextView
+            android:id="@+id/tvSubtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Your appointment has been successfully booked"
+            android:textSize="15sp"
+            android:textColor="@color/white"
+            android:alpha="0.9"
+            android:gravity="center"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp"
+            android:layout_marginTop="4dp"
+            app:layout_constraintTop_toBottomOf="@id/tvTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <!-- Appointment Details Card -->
         <androidx.cardview.widget.CardView
@@ -68,14 +83,14 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
-            android:layout_marginTop="-40dp"
             android:layout_marginEnd="24dp"
-            app:cardBackgroundColor="@color/white"
+            android:layout_marginTop="-45dp"
             app:cardCornerRadius="20dp"
             app:cardElevation="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:cardBackgroundColor="@color/white"
+            app:layout_constraintTop_toBottomOf="@id/viewHeaderGradient"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/viewHeaderGradient">
+            app:layout_constraintEnd_toEndOf="parent">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -97,15 +112,15 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp">
 
                     <TextView
                         android:layout_width="120dp"
                         android:layout_height="wrap_content"
                         android:text="Patient Name:"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="14sp" />
+                        android:textSize="14sp"
+                        android:textColor="@color/text_secondary" />
 
                     <TextView
                         android:id="@+id/tvPatientName"
@@ -113,9 +128,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="John Doe"
-                        android:textColor="@color/text_primary"
                         android:textSize="14sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary" />
 
                 </LinearLayout>
 
@@ -123,15 +138,15 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp">
 
                     <TextView
                         android:layout_width="120dp"
                         android:layout_height="wrap_content"
                         android:text="Email:"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="14sp" />
+                        android:textSize="14sp"
+                        android:textColor="@color/text_secondary" />
 
                     <TextView
                         android:id="@+id/tvEmail"
@@ -139,9 +154,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="john@example.com"
-                        android:textColor="@color/text_primary"
                         android:textSize="14sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary" />
 
                 </LinearLayout>
 
@@ -149,15 +164,15 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp">
 
                     <TextView
                         android:layout_width="120dp"
                         android:layout_height="wrap_content"
                         android:text="Phone:"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="14sp" />
+                        android:textSize="14sp"
+                        android:textColor="@color/text_secondary" />
 
                     <TextView
                         android:id="@+id/tvPhone"
@@ -165,9 +180,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="+1234567890"
-                        android:textColor="@color/text_primary"
                         android:textSize="14sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary" />
 
                 </LinearLayout>
 
@@ -175,15 +190,15 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp">
 
                     <TextView
                         android:layout_width="120dp"
                         android:layout_height="wrap_content"
                         android:text="Date:"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="14sp" />
+                        android:textSize="14sp"
+                        android:textColor="@color/text_secondary" />
 
                     <TextView
                         android:id="@+id/tvDate"
@@ -191,9 +206,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="15/11/2024"
-                        android:textColor="@color/primary"
                         android:textSize="14sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:textColor="@color/primary" />
 
                 </LinearLayout>
 
@@ -201,15 +216,15 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="20dp"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="20dp">
 
                     <TextView
                         android:layout_width="120dp"
                         android:layout_height="wrap_content"
                         android:text="Time:"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="14sp" />
+                        android:textSize="14sp"
+                        android:textColor="@color/text_secondary" />
 
                     <TextView
                         android:id="@+id/tvTime"
@@ -217,9 +232,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="10:30 AM"
-                        android:textColor="@color/primary"
                         android:textSize="14sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:textColor="@color/primary" />
 
                 </LinearLayout>
 
@@ -227,8 +242,8 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginBottom="16dp"
-                    android:background="@color/divider" />
+                    android:background="@color/divider"
+                    android:layout_marginBottom="16dp" />
 
                 <!-- Action Buttons -->
                 <Button
@@ -246,11 +261,11 @@
                     android:id="@+id/btnLogout"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:background="@drawable/button_outlined"
                     android:text="Logout"
-                    android:textColor="@color/primary"
                     android:textSize="15sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:textColor="@color/primary"
+                    android:background="@drawable/button_outlined" />
 
             </LinearLayout>
 
@@ -262,20 +277,20 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginTop="24dp"
-            android:indeterminateTint="@color/primary"
             android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:indeterminateTint="@color/primary"
+            app:layout_constraintTop_toBottomOf="@id/cardAppointmentDetails"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardAppointmentDetails" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <!-- Bottom Spacer -->
         <View
             android:layout_width="0dp"
             android:layout_height="40dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cardAppointmentDetails"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardAppointmentDetails" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
